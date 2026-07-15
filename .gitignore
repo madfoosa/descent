@@ -1,2 +1,4 @@
-*.zip
 node_modules/
+*.log
+diag.js
+tune.js
