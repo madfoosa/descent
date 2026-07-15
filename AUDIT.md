@@ -2,7 +2,7 @@
 *Audited 2026-07-14 in Claude Code before any code was written. HANDOFF.md is kept verbatim; where this audit conflicts with it, the audit wins.*
 
 ## Context change since the handoff was written
-Written for a cold-start Cowork session. This build happens in Claude Code with direct file access: **this git repo is the canonical deliverable** (`descent.html` lives here), and `gruesandgloryv2.html` can likely be read from disk rather than uploaded — search before asking (Open question 1 may answer itself).
+Written for a cold-start Cowork session. This build happens in Claude Code with direct file access: **this git repo is the canonical deliverable** (`descent.html` lives here), and `gruesandgloryv2.html` was located on disk (2026-07-14): `C:\Users\madfo\iCloudDrive\Projects\Software\Grues and glory\gruesandgloryv2.html`. Open question 1 is resolved — exact palette, CSS, and voice are readable directly.
 
 ## Findings
 
