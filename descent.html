@@ -1,7 +1,12 @@
 <!DOCTYPE html>
 <html lang="en"><head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#05060a">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="DESCENT">
 <title>DESCENT — beneath the Great Underground Empire</title>
 <style>
 :root{
@@ -21,7 +26,7 @@ body.steady #screen{animation:none;filter:none}
 #map{white-space:pre;line-height:1.0;font-size:15px;letter-spacing:1px;text-shadow:0 0 3px var(--phos-dim)}
 #hud{display:flex;gap:14px;flex-wrap:wrap;font-size:13px;color:var(--phos-dim);margin:6px 2px 2px;max-width:760px}
 #hud b{color:var(--phos)} #hud .warn{color:var(--amber)} #hud .bad{color:var(--red)}
-#log{height:104px;overflow:hidden;font-size:13px;line-height:1.45;max-width:760px;width:760px;margin-top:4px;color:var(--phos-dim)}
+#log{height:104px;overflow:hidden;font-size:13px;line-height:1.45;max-width:760px;width:100%;margin-top:4px;color:var(--phos-dim)}
 #log .l{opacity:.55}#log .l:last-child{opacity:1;color:var(--phos)}
 #log .grue{color:var(--amber)}#log .death,#log .dmg{color:var(--red)}#log .win{color:var(--phos);font-weight:bold}
 #log .get,#log .use{color:var(--phos)}#log .npc{color:#7fd7ff}#log .floor{color:var(--amber)}
@@ -43,6 +48,41 @@ body.steady #screen{animation:none;filter:none}
 #help h2{color:var(--amber);margin-bottom:12px}#help kbd{color:var(--phos);border:1px solid var(--phos-dim);padding:0 5px;border-radius:3px;font-size:12px}
 #help .close{margin-top:18px}
 .hidden{display:none}
+
+/* ---- mobile / touch ---- */
+body{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+#crt{padding:8px 8px calc(8px + env(safe-area-inset-bottom))}
+#screen{display:flex;flex-direction:column;align-items:center;max-width:100%}
+#hud,#legend{width:100%}
+#map{touch-action:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+.pbtn{background:none;border:1px solid var(--phos-dim);color:var(--phos);font-family:inherit;
+  border-radius:4px;font-size:13px;cursor:pointer;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+.pbtn:active{border-color:var(--phos);box-shadow:0 0 8px var(--phos-dim)}
+.pbtn.ready{border-color:var(--amber);color:var(--amber)}
+#pad{display:none;margin-top:10px;width:100%;max-width:560px;justify-content:center;align-items:center;gap:16px}
+body.touch #pad{display:flex}
+#dpad{display:grid;grid-template-columns:repeat(3,54px);grid-template-rows:repeat(3,54px);gap:5px}
+#dpad .pbtn{font-size:20px;line-height:1;color:var(--phos-dim)}
+#dpad .pbtn:active{color:var(--phos)}
+#acts{display:grid;grid-template-columns:repeat(2,minmax(86px,1fr));gap:6px;flex:1;max-width:220px}
+#acts .pbtn{padding:14px 4px}
+#lanternChoice{display:none;gap:10px;margin-top:8px;justify-content:center}
+#lanternChoice.show{display:flex}
+#lanternChoice .pbtn{padding:12px 16px}
+#lanternChoice .snuffbtn{border-color:#552222;color:#c96}
+body.touch .kbhint{display:none}
+.thint{display:none}body.touch .thint{display:inline}
+#legend .invbtn{display:inline-block;border:1px solid var(--wallc);border-radius:3px;padding:2px 7px;margin:2px 1px;color:var(--phos);cursor:pointer}
+@media (max-width:720px){
+  #map{letter-spacing:0}
+  #hud{font-size:11px;gap:7px;margin-top:4px}
+  #log{font-size:12px;height:70px;line-height:1.4}
+  #legend{font-size:10px}
+  #top{font-size:12px}
+  #top a{margin-left:14px}
+  #overlay h1{font-size:20px}
+  #help{padding:20px}
+}
 </style></head>
 <body>
 <div id="top"><span id="seedlabel"></span><a id="steadyToggle">steady: off</a><a id="helpBtn">?</a></div>
@@ -51,6 +91,23 @@ body.steady #screen{animation:none;filter:none}
   <div id="hud"></div>
   <div id="log"></div>
   <div id="legend"></div>
+  <div id="lanternChoice">
+    <button class="pbtn" data-a="raise">RAISE THE LANTERN</button>
+    <button class="pbtn snuffbtn" data-a="snuff">SNUFF IT</button>
+  </div>
+  <div id="pad">
+    <div id="dpad">
+      <button class="pbtn" data-d="y">&#8598;</button><button class="pbtn" data-d="k">&#8593;</button><button class="pbtn" data-d="u">&#8599;</button>
+      <button class="pbtn" data-d="h">&#8592;</button><button class="pbtn" data-d="wait">&middot;</button><button class="pbtn" data-d="l">&#8594;</button>
+      <button class="pbtn" data-d="b">&#8601;</button><button class="pbtn" data-d="j">&#8595;</button><button class="pbtn" data-d="n">&#8600;</button>
+    </div>
+    <div id="acts">
+      <button class="pbtn" data-a="get">GET</button>
+      <button class="pbtn" data-a="descend" id="descBtn">DOWN &gt;</button>
+      <button class="pbtn" data-a="shutter" id="shutBtn">SHUTTER</button>
+      <button class="pbtn" id="padHelp">HELP ?</button>
+    </div>
+  </div>
 </div></div>
 
 <div id="overlay"><div>
@@ -66,6 +123,7 @@ body.steady #screen{animation:none;filter:none}
   <p>You carry the only light. Eight floors down waits the First Lantern; raise it and the Empire remembers morning. The dark is not empty.</p>
   <p style="margin-top:12px"><b>Move:</b> <kbd>arrows</kbd> / <kbd>hjkl</kbd> / <kbd>numpad</kbd> / <kbd>yubn</kbd> diagonals. Walk into a monster to attack it.</p>
   <p><b>Act:</b> <kbd>g</kbd> get · <kbd>&gt;</kbd> descend stairs · <kbd>i</kbd>/<kbd>1-8</kbd> use item · <kbd>s</kbd> shutter lantern · <kbd>.</kbd> wait · <kbd>?</kbd> help</p>
+  <p style="margin-top:8px"><b>Touch:</b> the d-pad moves (hold to repeat), or swipe the map in any of eight directions, or tap a tile to step toward it. Tap your own tile to grab what's under you. Tap a pack item to use it. On floor 8 the choice appears as buttons.</p>
   <p style="margin-top:12px">Your lantern burns fuel each turn. In true darkness you get three warnings, then a grue takes you. A <b>shuttered</b> lantern gives exactly three dark turns — enough to cross a gas pocket without igniting it. Rest in the light and wounds close, slowly.</p>
   <p style="margin-top:12px;color:var(--phos-dim)">Progress saves every turn — close the tab and come back. Death is permanent, but you can always begin again. The grues remember either way.</p>
   <button class="tbtn close" id="helpClose">back (esc)</button>
@@ -638,9 +696,9 @@ root.DESCENT = {
 "use strict";
 const D = globalThis.DESCENT;
 const GLYPH_MON = {}; for (const [k,m] of Object.entries(D.MONSTERS)) GLYPH_MON[k]=m.g;
-let S = null, savedThisFloor = null;
+let S = null;
 
-// ---- storage adapter (AUDIT F3: degrade gracefully under file://) ----
+// ---- storage adapter (degrade gracefully under file://) ----
 const store = (() => {
   let ok = true;
   try { localStorage.setItem("__t","1"); localStorage.removeItem("__t"); } catch(e){ ok=false; }
@@ -655,11 +713,45 @@ const store = (() => {
 
 function reviveState(raw){ const s=JSON.parse(raw); s.rng=D.mulberry32((s.seed^(s.turn*2654435761))>>>0); s.explored=new Set(s.explored); return s; }
 
+// ---- camera viewport: a readable window around @, stable across turns ----
+// 48x26 is too wide to show whole AND large on a phone. Pick a comfortable font
+// size and render a viewport of that many tiles centred on the player. The font is
+// computed analytically (no flaky scrollWidth), so it never changes between turns.
+// On a wide screen the viewport grows to the whole map.
+const VIEW={ox:0,oy:0,vw:D.W,vh:D.H,fs:15,key:""};
+function computeView(){
+  const narrow=document.documentElement.clientWidth<380;
+  const key=document.documentElement.clientWidth+"x"+window.innerHeight+":"+document.body.classList.contains("touch");
+  if(key===VIEW.key) return; VIEW.key=key;
+  const availW=document.documentElement.clientWidth-16;
+  const chrome=document.getElementById("hud").offsetHeight+document.getElementById("log").offsetHeight+
+               document.getElementById("legend").offsetHeight+
+               (document.body.classList.contains("touch")?document.getElementById("pad").offsetHeight+12:0)+44;
+  const availH=Math.max(120, window.innerHeight-chrome);
+  const LS=narrow?0:1;                        // letter-spacing from CSS
+  const cw=fs=>fs*0.60+LS, lh=fs=>fs*1.08;    // monospace glyph box estimates
+  const TARGET_COLS=30, TARGET_ROWS=22;       // aim to show ~this much; font grows to suit
+  let fs=Math.min((availW/TARGET_COLS-LS)/0.60, availH/(TARGET_ROWS*1.08));
+  fs=Math.max(12, Math.min(20, Math.floor(fs)));    // readable floor of 12px
+  VIEW.fs=fs;
+  VIEW.vw=Math.max(10, Math.min(D.W, Math.floor(availW/cw(fs))));
+  VIEW.vh=Math.max(10, Math.min(D.H, Math.floor(availH/lh(fs))));
+  document.getElementById("map").style.fontSize=fs+"px";
+}
+window.addEventListener("resize",()=>{ VIEW.key=""; if(S){ computeView(); render(); } });
+requestAnimationFrame(()=>{ VIEW.key=""; if(S){ computeView(); render(); } });
+
 // ---- rendering ----
 function render(){
-  const rows=[]; const light=D.currentLight(S);
-  for(let y=0;y<D.H;y++){ let line="";
-    for(let x=0;x<D.W;x++){ const k=y*D.W+x; const vis=S.vis.has(k), seen=S.explored.has(k);
+  computeView();
+  const vw=VIEW.vw, vh=VIEW.vh;
+  VIEW.ox=Math.max(0, Math.min(D.W-vw, S.px-(vw>>1)));
+  VIEW.oy=Math.max(0, Math.min(D.H-vh, S.py-(vh>>1)));
+  const mapEl=document.getElementById("map");
+  let html="";
+  for(let ry=0;ry<vh;ry++){ const y=VIEW.oy+ry;
+    for(let rx=0;rx<vw;rx++){ const x=VIEW.ox+rx; const k=y*D.W+x;
+      const vis=S.vis.has(k), seen=S.explored.has(k);
       let ch=" ";
       if(vis){
         const mon=S.monsters.find(m=>m.x===x&&m.y===y);
@@ -669,26 +761,18 @@ function render(){
         else if(it) ch=D.ITEMS[it.key].g;
         else{ const t=S.grid[y][x]; ch = t===D.T.WALL?"#":t===D.T.STAIRS?">":t===D.T.FUNGUS?'"':"."; }
       } else if(seen){ const t=S.grid[y][x]; ch = t===D.T.WALL?"#":t===D.T.STAIRS?">":"·"; }
-      line+=ch;
-    } rows.push(line);
+      let c=vis?"var(--phos)":"var(--memory)";
+      if(ch==="@")c="var(--phos)";
+      else if(ch==="&"||"wYSWzcr*".includes(ch)&&vis)c="var(--amber)";
+      else if(ch===">"&&vis)c="var(--phos)";
+      else if(ch==="#")c=vis?"var(--wallc)":"var(--grid)";
+      else if("!/%$|[(-?".includes(ch)&&vis)c="var(--phos)";
+      html+= ch===" "?" ":`<span style="color:${c}">${ch===">"?"&gt;":ch}</span>`;
+    } html+="\n";
   }
-  // colorize: build spans
-  const mapEl=document.getElementById("map");
-  let html="";
-  for(let y=0;y<rows.length;y++){ for(let x=0;x<rows[y].length;x++){ const ch=rows[y][x]; const k=y*D.W+x;
-    const vis=S.vis.has(k);
-    let c=vis?"var(--phos)":"var(--memory)";
-    if(ch==="@")c="var(--phos)";
-    else if(ch==="&"||"wYSWzcr*".includes(ch)&&vis)c="var(--amber)";
-    else if(ch===">"&&vis)c="var(--phos)";
-    else if(ch==="#")c=vis?"var(--wallc)":"var(--grid)";
-    else if("!/%$|[(-?".includes(ch)&&vis)c="var(--phos)";
-    html+= ch===" "?" ":`<span style="color:${c}">${ch==="<"?"&lt;":ch===">"?"&gt;":ch}</span>`;
-  } html+="\n"; }
   mapEl.innerHTML=html;
 
   // HUD
-  const fuelPct=S.maxfuel?S.fuel/S.maxfuel:0;
   const fuelCls=S.fuel<=8?"bad":S.fuel<=25?"warn":"";
   const hpCls=S.hp<=4?"bad":S.hp<=8?"warn":"";
   const lm=S.lightMode==="shuttered"?"SHUTTERED":S.lightMode==="torch"?("torch "+S.torchTurns):(S.fuel>0?"lantern":"DARK");
@@ -701,19 +785,26 @@ function render(){
     `<span>Turn ${S.turn}</span>`;
 
   // log (last 6)
-  const logEl=document.getElementById("log");
-  logEl.innerHTML=S.log.slice(-6).map(e=>`<div class="l ${e.t}">${e.m}</div>`).join("");
+  document.getElementById("log").innerHTML=S.log.slice(-6).map(e=>`<div class="l ${e.t}">${e.m}</div>`).join("");
 
-  // legend + inventory
-  const inv=S.inv.map((k,i)=>`${i+1}:${D.ITEMS[k].name}`).join("  ")||"(empty)";
+  // legend + inventory (pack items are tappable)
+  const inv=S.inv.map((k,i)=>`<span class="invbtn" data-use="${k}">${i+1}:${D.ITEMS[k].name}</span>`).join(" ")||"(empty)";
   document.getElementById("legend").innerHTML=
-    `move hjkl/arrows · g get · &gt; stairs · s shutter · 1-8 use · . wait · ? help<br><span style="color:var(--phos-dim)">pack — ${inv}</span>`;
+    `<span class="kbhint">move hjkl/arrows · g get · &gt; stairs · s shutter · 1-8 use · . wait · ? help</span>`+
+    `<span class="thint">swipe or tap the map to move · tap a pack item to use it</span>`+
+    `<br><span style="color:var(--phos-dim)">pack — </span>${inv}`;
+
+  // contextual touch UI
+  document.getElementById("descBtn").classList.toggle("ready", S.grid[S.py][S.px]===D.T.STAIRS);
+  document.getElementById("shutBtn").textContent = S.lightMode==="shuttered"?"UNSHUTTER":"SHUTTER";
+  const fl=S.setpieces.firstLantern;
+  document.getElementById("lanternChoice").classList.toggle("show",
+    !!(S.alive && S.depth===D.FLOORS && fl && S.px===fl.x && S.py===fl.y));
 }
 
 // ---- turn handling ----
 function act(action){
   if(!S||!S.alive) return;
-  const prevDepth=S.depth;
   D.step(S,action);
   render();
   if(!S.alive){ endRun(); store.del("descent_save"); return; }
@@ -760,11 +851,6 @@ function newGame(seed){
 }
 
 // ---- input ----
-const KEYMAP={
-  ArrowLeft:"h",ArrowRight:"l",ArrowUp:"k",ArrowDown:"j",
-  h:"h",j:"j",k:"k",l:"l",y:"y",u:"u",b:"b",n_diag:"n",
-  "4":"h","6":"l","8":"k","2":"j","7":"y","9":"u","1":"b","3":"n",
-};
 document.addEventListener("keydown",e=>{
   const helpOpen=document.getElementById("help").classList.contains("show");
   if(helpOpen){ if(e.key==="Escape"||e.key==="?") document.getElementById("help").classList.remove("show"); return; }
@@ -773,13 +859,10 @@ document.addEventListener("keydown",e=>{
   const k=e.key;
   if(k==="?"){ document.getElementById("help").classList.add("show"); e.preventDefault(); return; }
   if(k==="Escape") return;
-  // movement
   const dirKeys={ArrowLeft:"h",ArrowRight:"l",ArrowUp:"k",ArrowDown:"j",h:"h",j:"j",k:"k",l:"l",y:"y",u:"u",b:"b",n:"n"};
   if(k in dirKeys){ e.preventDefault(); act(dirKeys[k]); return; }
   if(/^[123456789]$/.test(k)){
     const numMove={"4":"h","6":"l","8":"k","2":"j","7":"y","9":"u","1":"b","3":"n"};
-    // numbers 1-8 as item use if inventory has that slot AND not a movement numpad context:
-    // prefer item use for 1-8 (numpad diagonal users can use yubn); 5 = wait
     if(k==="5"){ act("wait"); return; }
     const idx=parseInt(k)-1;
     if(S && idx<S.inv.length){ act("use:"+S.inv[idx]); return; }
@@ -792,24 +875,52 @@ document.addEventListener("keydown",e=>{
   if(k==="s"){ act("shutter"); return; }
   if(k==="R"&&S&&S.depth===8){ act("raise"); return; }
   if(k==="X"&&S&&S.depth===8){ act("snuff"); return; }
-  if(k==="i"){ /* inventory is always shown in legend */ return; }
 });
 
-// floor-8 choice buttons appear contextually via keys R (raise) / X (snuff); also clickable prompt
-document.addEventListener("keydown",e=>{
-  if(S&&S.depth===8&&S.alive){
-    const fl=S.setpieces.firstLantern;
-    if(S.px===fl.x&&S.py===fl.y){
-      if(e.key==="Enter"||e.key==="R"||e.key==="r"){ act("raise"); }
-    }
-  }
+// ---- touch + mouse controls ----
+if(matchMedia("(pointer: coarse)").matches || "ontouchstart" in window) document.body.classList.add("touch");
+
+// d-pad: tap to step, hold to repeat
+document.querySelectorAll("#dpad .pbtn").forEach(b=>{
+  const go=()=>{ const d=b.dataset.d; act(d==="wait"?"wait":d); };
+  let hold=null, rep=null;
+  const stop=()=>{ clearTimeout(hold); clearInterval(rep); hold=rep=null; };
+  b.addEventListener("pointerdown",e=>{ e.preventDefault(); go(); hold=setTimeout(()=>{ rep=setInterval(go,170); },400); });
+  for(const ev of ["pointerup","pointercancel","pointerleave"]) b.addEventListener(ev,stop);
+  b.addEventListener("contextmenu",e=>e.preventDefault());
 });
 
-// mouse: click adjacent tile to move
-document.getElementById("map").addEventListener("click",ev=>{
+// action buttons (get / descend / shutter / raise / snuff)
+document.querySelectorAll("[data-a]").forEach(b=>b.addEventListener("click",()=>act(b.dataset.a)));
+document.getElementById("padHelp").onclick=()=>document.getElementById("help").classList.add("show");
+
+// tap a pack item to use it
+document.getElementById("legend").addEventListener("click",e=>{
+  const u=e.target.dataset && e.target.dataset.use; if(u) act("use:"+u);
+});
+
+// map: tap a tile to step toward it (tap yourself = get/wait); swipe = move in that direction
+const mapEl=document.getElementById("map");
+function stepToward(clientX,clientY){
   if(!S||!S.alive) return;
-  const rect=ev.target.getBoundingClientRect?ev.target.getBoundingClientRect():null;
-});
+  const r=mapEl.getBoundingClientRect();
+  // map the tap through the camera viewport back to a grid tile
+  const cx=VIEW.ox+Math.floor((clientX-r.left)/(r.width/VIEW.vw));
+  const cy=VIEW.oy+Math.floor((clientY-r.top)/(r.height/VIEW.vh));
+  const dx=Math.sign(cx-S.px), dy=Math.sign(cy-S.py);
+  if(!dx&&!dy){ act(S.items.some(o=>o.x===S.px&&o.y===S.py)?"get":"wait"); return; }
+  act({"-1,-1":"y","0,-1":"k","1,-1":"u","-1,0":"h","1,0":"l","-1,1":"b","0,1":"j","1,1":"n"}[dx+","+dy]);
+}
+let tstart=null;
+mapEl.addEventListener("touchstart",e=>{ if(e.touches.length===1){ const t=e.touches[0]; tstart={x:t.clientX,y:t.clientY}; } },{passive:true});
+mapEl.addEventListener("touchend",e=>{
+  if(!tstart) return; e.preventDefault();
+  const t=e.changedTouches[0], dx=t.clientX-tstart.x, dy=t.clientY-tstart.y; tstart=null;
+  if(Math.max(Math.abs(dx),Math.abs(dy))<24){ stepToward(t.clientX,t.clientY); return; }
+  const deg=((Math.atan2(dy,dx)*180/Math.PI)+360)%360;
+  act(["l","n","j","b","h","y","k","u"][Math.round(deg/45)%8]);
+},{passive:false});
+mapEl.addEventListener("click",e=>stepToward(e.clientX,e.clientY));
 
 // ---- controls ----
 document.getElementById("againBtn").onclick=()=>newGame();
@@ -821,7 +932,6 @@ function applySteady(){ const on=store.get(steadyKey)==="1"; document.body.class
   document.getElementById("steadyToggle").textContent="steady: "+(on?"on":"off"); }
 document.getElementById("steadyToggle").onclick=()=>{ store.set(steadyKey, store.get(steadyKey)==="1"?"0":"1"); applySteady(); };
 applySteady();
-if(!store.ok){ /* surface storage limitation */ }
 
 // ---- boot: resume, or new game from hash/random ----
 (function boot(){
@@ -829,12 +939,11 @@ if(!store.ok){ /* surface storage limitation */ }
   const hashSeed=seedFromHash();
   if(saved){
     try{ S=reviveState(saved);
-      if(S.alive&&!S.won){ document.getElementById("seedlabel").textContent="seed #"+S.seed+"  "; render();
-        if(!store.ok) S.log.push({t:"sys",m:"(No saved storage in this browser — progress won't persist. Play on.)"});
-        return; }
+      if(S.alive&&!S.won){ document.getElementById("seedlabel").textContent="seed #"+S.seed+"  "; render(); return; }
     }catch(e){}
   }
   newGame(hashSeed);
 })();
 </script>
-</body></html>
+</body>
+</html>
