@@ -6,9 +6,18 @@ is full of grues. Companion to *Grues & Glory*. No dependencies, no install, no
 network — open `descent.html` in any browser (works from `file://`).
 
 ## Play
-Double-click `descent.html`. Move with arrows / `hjkl` / numpad / `yubn` (diagonals);
-walk into a monster to attack. `g` get, `>` descend, `1`–`8` use an inventory item,
-`s` shutter the lantern, `.` wait, `?` help. Everything you need is on screen.
+**Anywhere:** <https://madfoosa.github.io/descent/> — works on phones. On iOS/Android,
+"Add to Home Screen" for a fullscreen app. Progress saves per-device.
+
+**Desktop:** double-click `descent.html`. Move with arrows / `hjkl` / numpad / `yubn`
+(diagonals); walk into a monster to attack. `g` get, `>` descend, `1`–`8` use an
+inventory item, `s` shutter the lantern, `.` wait, `?` help. Click a map tile to step
+toward it. Everything you need is on screen.
+
+**Touch:** on-screen d-pad (hold to repeat), or swipe the map in eight directions, or
+tap a tile to step toward it; tap your own tile to grab what's under you. Tap a pack
+item to use it. Shutter/descend are buttons; the floor-8 choice appears as buttons.
+The map auto-scales to the screen.
 
 Your lantern burns fuel each turn. In true darkness you get three warnings, then a
 grue takes you (canon: *"It is pitch black. You are likely to be eaten by a grue."*).
@@ -30,6 +39,7 @@ raise the First Lantern to win; there is also a quieter, darker way to end it.
 `engine.js` is the pure, DOM-free game logic (exposed as `globalThis.DESCENT`);
 `descent.html` inlines it verbatim under a thin UI. To regenerate the single file
 after editing the engine, re-inline `engine.js` into the `<script>` block.
+(`index.html` on GitHub Pages is the same file, renamed so the URL serves it.)
 
 `node harness.js` — 29 checks, all green:
 - **Phase 1 (engine):** seed determinism (identical layouts), connectivity over
@@ -50,4 +60,5 @@ after editing the engine, re-inline `engine.js` into the `<script>` block.
 Floor 2 gas pocket (shutter through it for a big fuel flask). Floor 4 the hermit's
 ghost brother — give him a treasure, get 70 fuel. Floor 6 the thief's skeleton drops
 a lockpick. Floor 8 the First Lantern: **raise** it to win, or **snuff** it (stand on
-it, press `X`) for the secret ending — the screen goes dark, and the grues come.
+it, press `X` or tap SNUFF IT) for the secret ending — the screen goes dark, and the
+grues come.
